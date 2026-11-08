@@ -1,0 +1,6 @@
+# Un nombre por línea, tal como aparece en Strava (es la llave de acceso).
+# Las líneas que empiezan con # se ignoran.
+#
+# Ejemplo:
+# Juan Pérez
+# María José González
