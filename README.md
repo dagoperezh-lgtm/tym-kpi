@@ -28,8 +28,11 @@ la web quede al día.
 - `src/` — la app Next.js (App Router, TypeScript, Tailwind).
 - `supabase/migrations/0001_init.sql` — el esquema completo de la base de datos.
 - `sync/` — script Python que lee el Maestro desde Drive y lo sube a Supabase.
-- `admin/` — script para crear las cuentas de los atletas y generar sus links
-  de activación (para mandar por WhatsApp).
+- `admin/` — script de línea de comandos alternativo para crear cuentas (hace
+  lo mismo que `/admin` en la web, por si alguna vez se prefiere correrlo así).
+
+La forma recomendada de crear cuentas es la página **`/admin`** de la propia
+app web (protegida con la variable `ADMIN_PASSWORD`) — no requiere terminal.
 
 ## Autenticación
 
@@ -84,31 +87,22 @@ API routes, el script de sync, el script de aprovisionamiento).
    `dagoperezh-lgtm/tym-kpi`.
 2. Nombre del proyecto: `tym-kpi` (queda en `tym-kpi.vercel.app`, sin tu
    nombre en la URL).
-3. En **Environment Variables**, agrega las 3 del `.env.example`:
+3. En **Environment Variables**, agrega las 4 del `.env.example`:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
-   - `SESSION_SECRET` (genera una con `openssl rand -base64 32`)
+   - `SESSION_SECRET` (cualquier string largo y aleatorio)
+   - `ADMIN_PASSWORD` (la contraseña para entrar a `/admin`)
 4. Deploy.
 
 ### 3. Crear las cuentas de los atletas
 
-```bash
-cd admin
-pip install -r requirements.txt
-cp atletas.example.txt atletas.txt
-# edita atletas.txt: un nombre por línea, tal como aparece en Strava
-
-export SUPABASE_URL=...
-export SUPABASE_SERVICE_ROLE_KEY=...
-export BASE_URL=https://tym-kpi.vercel.app
-
-python3 provisionar_atletas.py
-```
-
-El script imprime, para cada atleta que todavía no activó su cuenta, un
-mensaje listo para copiar y pegar en WhatsApp con su link de activación
-personal (de un solo uso). Puedes correrlo de nuevo cuando sumes atletas
-nuevos — a los que ya tienen cuenta activa no les vuelve a generar nada.
+Entra a `https://tym-kpi.vercel.app/admin`, pon la `ADMIN_PASSWORD`, pega los
+nombres (uno por línea, tal como aparecen en Strava) y haz clic en **"Crear
+cuentas y generar links"**. La página te muestra, para cada atleta que
+todavía no activó su cuenta, un mensaje listo para copiar y pegar en
+WhatsApp con su link de activación personal (de un solo uso). Puedes volver
+a esta página cuando sumes atletas nuevos — a los que ya tienen cuenta
+activa no les vuelve a generar nada.
 
 ### 4. Sincronizar los datos cada semana
 
