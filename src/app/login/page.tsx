@@ -1,39 +1,9 @@
-"use client";
-
-import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-
-function FormularioLogin() {
-  const router = useRouter();
-  const params = useSearchParams();
-  const [usuario, setUsuario] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [cargando, setCargando] = useState(false);
-
-  async function enviar(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setCargando(true);
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, password }),
-      });
-      const datos = await res.json();
-      if (!res.ok) {
-        setError(datos.error ?? "No se pudo iniciar sesión.");
-        return;
-      }
-      router.push(params.get("next") ?? "/club");
-      router.refresh();
-    } catch {
-      setError("No se pudo conectar. Revisa tu conexión e intenta de nuevo.");
-    } finally {
-      setCargando(false);
-    }
-  }
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; usuario?: string; next?: string }>;
+}) {
+  const params = await searchParams;
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
@@ -43,7 +13,13 @@ function FormularioLogin() {
           <p className="mt-1 text-sm text-slate-500">Resultados y ranking semanal del equipo</p>
         </div>
 
-        <form onSubmit={enviar} className="space-y-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <form
+          method="POST"
+          action="/api/auth/login"
+          className="space-y-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200"
+        >
+          <input type="hidden" name="next" value={params.next ?? ""} />
+
           <div>
             <label htmlFor="usuario" className="mb-1 block text-sm font-medium text-slate-700">
               Usuario (tu nombre en Strava)
@@ -54,8 +30,7 @@ function FormularioLogin() {
               type="text"
               autoComplete="username"
               required
-              value={usuario}
-              onChange={(e) => setUsuario(e.target.value)}
+              defaultValue={params.usuario ?? ""}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               placeholder="Ej: Juan Pérez"
             />
@@ -71,37 +46,29 @@ function FormularioLogin() {
               type="password"
               autoComplete="current-password"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
-          {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+          {params.error && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{params.error}</p>
           )}
 
           <button
             type="submit"
-            disabled={cargando}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-base font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
+            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-base font-semibold text-white transition-colors hover:bg-blue-700"
           >
-            {cargando ? "Entrando…" : "Entrar"}
+            Entrar
           </button>
         </form>
 
         <p className="mt-6 text-center text-xs text-slate-400">
-          ¿Todavía no activaste tu cuenta? Usa el link que te enviaron por WhatsApp.
+          ¿Todavía no tienes cuenta?{" "}
+          <a href="/activar" className="font-medium text-blue-600">
+            Créala acá
+          </a>
         </p>
       </div>
     </div>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense>
-      <FormularioLogin />
-    </Suspense>
   );
 }

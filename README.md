@@ -28,23 +28,40 @@ la web quede al día.
 - `src/` — la app Next.js (App Router, TypeScript, Tailwind).
 - `supabase/migrations/0001_init.sql` — el esquema completo de la base de datos.
 - `sync/` — script Python que lee el Maestro desde Drive y lo sube a Supabase.
-- `admin/` — script de línea de comandos alternativo para crear cuentas (hace
-  lo mismo que `/admin` en la web, por si alguna vez se prefiere correrlo así).
-
-La forma recomendada de crear cuentas es la página **`/admin`** de la propia
-app web (protegida con la variable `ADMIN_PASSWORD`) — no requiere terminal.
 
 ## Autenticación
 
 No usamos Strava para el login (solo hay 10 atletas conectados a Strava hoy;
-el club tiene más de 80). En cambio:
+el club tiene más de 80). En cambio, el registro es **autoservicio**, sin
+que el administrador tenga que crear cuentas ni mandar links uno por uno:
 
 - **Usuario** = el mismo nombre que el atleta usa en Strava (es la misma
   llave — `MatchKey` — que ya usa club-kpi-platform para identificarlo en
   todo el sistema).
-- **Contraseña** = propia de esta app, que cada atleta define la primera vez
-  que entra, a través de un link de activación de un solo uso que tú le
-  mandas por WhatsApp.
+- **Contraseña** = propia de esta app. Cada atleta entra a `/activar`,
+  escribe su nombre y elige su propia contraseña — no hay token ni link
+  individual de por medio.
+
+Se manda **un solo link** (`https://tym-kpi.vercel.app/activar`) al grupo de
+WhatsApp del club, una vez, y cada atleta se registra solo.
+
+**Tradeoff asumido a propósito**: como no hay token que verifique identidad,
+en teoría alguien podría registrarse con el nombre de otro atleta. Para un
+club cerrado donde todos se conocen, el riesgo real es bajo y se prefirió
+sobre la alternativa (un link único por atleta, que resultó impráctico de
+operar a mano con 80 personas). Si una cuenta ya tiene contraseña, no se
+puede volver a registrar con ese mismo nombre — eso sí está bloqueado.
+
+La tabla `activaciones` del esquema SQL quedó sin uso con este cambio (era
+para el sistema de tokens individuales que se descartó). No hace daño
+dejarla vacía; se puede borrar más adelante con una migración aparte.
+
+Todos los formularios de la app (`/login`, `/activar`, el botón de salir) son
+formularios HTML clásicos, sin JavaScript de por medio en el envío: se
+descartó una primera versión con `fetch()` porque, en pruebas reales, algo en
+el navegador podía "tragarse" la respuesta sin mostrar ni el resultado ni un
+error — con un `<form>` normal eso no puede pasar, en el peor caso la página
+tarda en recargar pero siempre termina mostrando algo.
 
 ## Limitaciones conocidas (datos que el Maestro no guarda)
 
@@ -79,7 +96,7 @@ semana) — avísame cuando quieras que lo hagamos.
 
 La `service_role` key da acceso total a la base de datos — nunca la pongas en
 código del navegador. En esta app solo se usa del lado del servidor (Next.js
-API routes, el script de sync, el script de aprovisionamiento).
+API routes y el script de sync).
 
 ### 2. Desplegar en Vercel
 
@@ -87,22 +104,17 @@ API routes, el script de sync, el script de aprovisionamiento).
    `dagoperezh-lgtm/tym-kpi`.
 2. Nombre del proyecto: `tym-kpi` (queda en `tym-kpi.vercel.app`, sin tu
    nombre en la URL).
-3. En **Environment Variables**, agrega las 4 del `.env.example`:
+3. En **Environment Variables**, agrega las 3 del `.env.example`:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `SESSION_SECRET` (cualquier string largo y aleatorio)
-   - `ADMIN_PASSWORD` (la contraseña para entrar a `/admin`)
 4. Deploy.
 
-### 3. Crear las cuentas de los atletas
+### 3. Avisarle al equipo
 
-Entra a `https://tym-kpi.vercel.app/admin`, pon la `ADMIN_PASSWORD`, pega los
-nombres (uno por línea, tal como aparecen en Strava) y haz clic en **"Crear
-cuentas y generar links"**. La página te muestra, para cada atleta que
-todavía no activó su cuenta, un mensaje listo para copiar y pegar en
-WhatsApp con su link de activación personal (de un solo uso). Puedes volver
-a esta página cuando sumes atletas nuevos — a los que ya tienen cuenta
-activa no les vuelve a generar nada.
+Manda un solo mensaje al grupo de WhatsApp del club con el link
+`https://tym-kpi.vercel.app/activar` para que cada atleta cree su propia
+cuenta (nombre + contraseña, sin nada más que hacer de tu parte).
 
 ### 4. Sincronizar los datos cada semana
 

@@ -26,14 +26,6 @@ export interface Atleta {
   creado_en: string;
 }
 
-export interface Activacion {
-  token: string;
-  atleta_id: string;
-  usado_en: string | null;
-  expira_en: string;
-  creado_en: string;
-}
-
 export interface SemanaClub {
   etiqueta_semana: string;
   fecha_inicio: string | null;

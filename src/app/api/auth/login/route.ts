@@ -5,13 +5,23 @@ import { matchKey } from "@/lib/match-key";
 import { firmarSesion, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/session";
 import type { Atleta } from "@/lib/types";
 
+/** Formulario clásico (sin fetch): ver la nota en /api/auth/registrar. */
 export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null);
-  const nombreIngresado = typeof body?.usuario === "string" ? body.usuario : "";
-  const password = typeof body?.password === "string" ? body.password : "";
+  const form = await request.formData();
+  const nombreIngresado = String(form.get("usuario") ?? "");
+  const password = String(form.get("password") ?? "");
+  const next = String(form.get("next") ?? "");
+  const destino = next.startsWith("/") && !next.startsWith("//") ? next : "/club";
+
+  function conError(mensaje: string) {
+    const url = new URL("/login", request.url);
+    url.searchParams.set("error", mensaje);
+    if (nombreIngresado) url.searchParams.set("usuario", nombreIngresado);
+    return NextResponse.redirect(url, { status: 303 });
+  }
 
   if (!nombreIngresado.trim() || !password) {
-    return NextResponse.json({ error: "Ingresa tu usuario y tu contraseña." }, { status: 400 });
+    return conError("Ingresa tu usuario y tu contraseña.");
   }
 
   const db = supabaseAdmin();
@@ -25,15 +35,12 @@ export async function POST(request: NextRequest) {
   if (!atleta || !atleta.password_hash) {
     // Mismo mensaje tanto si el usuario no existe como si no ha activado su
     // cuenta todavía: no revelamos cuál de las dos cosas pasó.
-    return NextResponse.json(
-      { error: "Usuario o contraseña incorrectos, o tu cuenta todavía no está activada." },
-      { status: 401 }
-    );
+    return conError("Usuario o contraseña incorrectos, o todavía no creaste tu cuenta.");
   }
 
   const coincide = await bcrypt.compare(password, atleta.password_hash);
   if (!coincide) {
-    return NextResponse.json({ error: "Usuario o contraseña incorrectos." }, { status: 401 });
+    return conError("Usuario o contraseña incorrectos.");
   }
 
   const token = await firmarSesion({
@@ -42,7 +49,7 @@ export async function POST(request: NextRequest) {
     nombre: atleta.nombre,
   });
 
-  const respuesta = NextResponse.json({ ok: true });
+  const respuesta = NextResponse.redirect(new URL(destino, request.url), { status: 303 });
   respuesta.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
