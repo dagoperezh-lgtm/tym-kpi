@@ -87,6 +87,7 @@ function paginaError(mensaje: string): NextResponse {
 function paginaResultados(resultados: ResultadoProvision[]): NextResponse {
   const conLink = resultados.filter((r) => r.link);
   const yaActivados = resultados.filter((r) => r.yaActivado);
+  const conError = resultados.filter((r) => !r.link && !r.yaActivado);
 
   const tarjetas = conLink
     .map((r) => {
@@ -105,14 +106,21 @@ function paginaResultados(resultados: ResultadoProvision[]): NextResponse {
       ? `<p class="nota">${yaActivados.length === 1 ? "1 atleta ya" : `${yaActivados.length} atletas ya`} tenía cuenta activada — no se le generó link: ${escapeHtml(yaActivados.map((r) => r.nombre).join(", "))}.</p>`
       : "";
 
+  const errores = conError
+    .map(
+      (r) => `<p class="error"><strong>${escapeHtml(r.nombre)}</strong>: ${escapeHtml(r.mensaje)}</p>`
+    )
+    .join("\n");
+
   const sinNovedades =
-    conLink.length === 0 && resultados.length > 0
+    conLink.length === 0 && conError.length === 0 && resultados.length > 0
       ? `<p class="ayuda">Todos los atletas de la lista ya tenían su cuenta activada.</p>`
       : "";
 
   return layout(`
 <h1>Resultado</h1>
 ${notaActivados}
+${errores}
 ${tarjetas}
 ${sinNovedades}
 <a class="boton" href="/admin">Crear más cuentas</a>
