@@ -11,6 +11,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
     "bcryptjs": "^3.0.3",
+    "exceljs": "^4.4.0",
+    "googleapis": "^189.0.0",
     "jose": "^6.2.15",
     "next": "16.4.5",
     "react": "19.3.0",

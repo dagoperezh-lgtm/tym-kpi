@@ -11,7 +11,7 @@ ya sube a Google Drive cada semana.
 ```
 club-kpi-platform (Streamlit)          tym-kpi (esta app)
   procesa Strava, genera el                   │
-  reporte Word, sube el Maestro    ──────►  sync/sync_maestro_a_supabase.py
+  reporte Word, sube el Maestro    ──────►  /sincronizar (botón en la web)
   actualizado a Google Drive          lee el Maestro (solo lectura)
                                         y sube los datos a Supabase
                                                  │
@@ -20,14 +20,16 @@ club-kpi-platform (Streamlit)          tym-kpi (esta app)
 ```
 
 La actualización es **semanal**: después de correr el procesamiento en
-club-kpi-platform, se corre `sync/sync_maestro_a_supabase.py` una vez para que
-la web quede al día.
+club-kpi-platform, se entra a `https://tym-kpi.vercel.app/sincronizar` y se
+hace clic en un botón — nada de terminal ni de scripts.
 
 ## Estructura del repo
 
 - `src/` — la app Next.js (App Router, TypeScript, Tailwind).
 - `supabase/migrations/0001_init.sql` — el esquema completo de la base de datos.
-- `sync/` — script Python que lee el Maestro desde Drive y lo sube a Supabase.
+- `src/lib/sincronizar.ts`, `src/lib/planilla.ts`, `src/lib/drive.ts` — la
+  sincronización con el Maestro (lee Drive, parsea el Excel, calcula
+  rankings/récords/fichas), disparada desde `/sincronizar`.
 
 ## Autenticación
 
@@ -56,12 +58,12 @@ La tabla `activaciones` del esquema SQL quedó sin uso con este cambio (era
 para el sistema de tokens individuales que se descartó). No hace daño
 dejarla vacía; se puede borrar más adelante con una migración aparte.
 
-Todos los formularios de la app (`/login`, `/activar`, el botón de salir) son
-formularios HTML clásicos, sin JavaScript de por medio en el envío: se
-descartó una primera versión con `fetch()` porque, en pruebas reales, algo en
-el navegador podía "tragarse" la respuesta sin mostrar ni el resultado ni un
-error — con un `<form>` normal eso no puede pasar, en el peor caso la página
-tarda en recargar pero siempre termina mostrando algo.
+Todos los formularios de la app (`/login`, `/activar`, `/sincronizar`, el
+botón de salir) son formularios HTML clásicos, sin JavaScript de por medio en
+el envío: se descartó una primera versión con `fetch()` porque, en pruebas
+reales, algo en el navegador podía "tragarse" la respuesta sin mostrar ni el
+resultado ni un error — con un `<form>` normal eso no puede pasar, en el peor
+caso la página tarda en recargar pero siempre termina mostrando algo.
 
 ## Limitaciones conocidas (datos que el Maestro no guarda)
 
@@ -96,7 +98,7 @@ semana) — avísame cuando quieras que lo hagamos.
 
 La `service_role` key da acceso total a la base de datos — nunca la pongas en
 código del navegador. En esta app solo se usa del lado del servidor (Next.js
-API routes y el script de sync).
+API routes).
 
 ### 2. Desplegar en Vercel
 
@@ -104,10 +106,15 @@ API routes y el script de sync).
    `dagoperezh-lgtm/tym-kpi`.
 2. Nombre del proyecto: `tym-kpi` (queda en `tym-kpi.vercel.app`, sin tu
    nombre en la URL).
-3. En **Environment Variables**, agrega las 3 del `.env.example`:
+3. En **Environment Variables**, agrega las 6 del `.env.example`:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `SESSION_SECRET` (cualquier string largo y aleatorio)
+   - `SYNC_PASSWORD` (la contraseña para entrar a `/sincronizar`)
+   - `GOOGLE_SERVICE_ACCOUNT_JSON` (el JSON completo de la cuenta de
+     servicio — puede ser la misma que ya usa club-kpi-platform, solo
+     necesita permiso de **lectura** sobre el Maestro en Drive)
+   - `DRIVE_MAESTRO_FILE_ID` (el mismo ID que usa club-kpi-platform)
 4. Deploy.
 
 ### 3. Avisarle al equipo
@@ -119,23 +126,10 @@ cuenta (nombre + contraseña, sin nada más que hacer de tu parte).
 ### 4. Sincronizar los datos cada semana
 
 Después de correr el procesamiento semanal en club-kpi-platform (que sube el
-Maestro actualizado a Drive):
-
-```bash
-cd sync
-pip install -r requirements.txt
-
-export GOOGLE_SERVICE_ACCOUNT_JSON='{"type": "service_account", ...}'  # el JSON completo
-export DRIVE_MAESTRO_FILE_ID=...        # el mismo que usa club-kpi-platform
-export SUPABASE_URL=...
-export SUPABASE_SERVICE_ROLE_KEY=...
-
-python3 sync_maestro_a_supabase.py
-```
-
-Puedes reusar la misma cuenta de servicio de Google que ya tiene
-club-kpi-platform (el JSON de credenciales) — solo necesita permiso de
-**lectura** sobre el archivo Maestro en Drive, no de escritura.
+Maestro actualizado a Drive), entra a
+`https://tym-kpi.vercel.app/sincronizar`, pon la `SYNC_PASSWORD` y haz clic en
+**"Sincronizar ahora"**. La página confirma cuántos atletas y récords se
+subieron, o muestra el error si algo falló.
 
 ---
 
