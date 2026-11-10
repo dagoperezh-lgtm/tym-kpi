@@ -18,8 +18,14 @@ export async function POST(request: NextRequest) {
     return pagina("error", "Contraseña incorrecta.");
   }
 
+  const archivo = form.get("maestro");
+  if (!(archivo instanceof File) || archivo.size === 0) {
+    return pagina("error", "No se recibió ningún archivo. Elige el Excel Maestro antes de enviar.");
+  }
+
   try {
-    const resumen = await sincronizarMaestro();
+    const buffer = Buffer.from(await archivo.arrayBuffer());
+    const resumen = await sincronizarMaestro(buffer);
     return pagina(
       "ok",
       `Listo ✅ Se sincronizó <strong>${escapeHtml(resumen.etiquetaSemana)}</strong>: ${resumen.atletas} atleta(s), ${resumen.rankings} filas de ranking, ${resumen.records} récord(es).`

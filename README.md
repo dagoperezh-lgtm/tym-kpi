@@ -4,32 +4,33 @@ Panel web mobile-first para que los atletas del Club TYM vean, desde el celular,
 los rankings del equipo y su propia ficha personal — sin que nadie tenga que
 enviarles un reporte. Es un proyecto **separado** de `club-kpi-platform`: no lo
 modifica ni depende de su código, solo lee el mismo Excel Maestro que esa app
-ya sube a Google Drive cada semana.
+genera cada semana (el mismo que ya descargas y guardas en tu computador).
 
 ## Cómo encaja con club-kpi-platform
 
 ```
 club-kpi-platform (Streamlit)          tym-kpi (esta app)
   procesa Strava, genera el                   │
-  reporte Word, sube el Maestro    ──────►  /sincronizar (botón en la web)
-  actualizado a Google Drive          lee el Maestro (solo lectura)
-                                        y sube los datos a Supabase
+  reporte Word y el Excel         ──────►  /sincronizar (subes el Excel)
+  Maestro actualizado — lo              parsea el Excel y sube
+  descargas a tu computador              los datos a Supabase
                                                  │
                                                  ▼
                                         Next.js (Vercel) ──► celular del atleta
 ```
 
 La actualización es **semanal**: después de correr el procesamiento en
-club-kpi-platform, se entra a `https://tym-kpi.vercel.app/sincronizar` y se
-hace clic en un botón — nada de terminal ni de scripts.
+club-kpi-platform y descargar el Maestro actualizado, se entra a
+`https://tym-kpi.vercel.app/sincronizar` y se sube ese mismo archivo — nada
+de terminal ni de scripts, ni de Google Drive de por medio.
 
 ## Estructura del repo
 
 - `src/` — la app Next.js (App Router, TypeScript, Tailwind).
 - `supabase/migrations/0001_init.sql` — el esquema completo de la base de datos.
-- `src/lib/sincronizar.ts`, `src/lib/planilla.ts`, `src/lib/drive.ts` — la
-  sincronización con el Maestro (lee Drive, parsea el Excel, calcula
-  rankings/récords/fichas), disparada desde `/sincronizar`.
+- `src/lib/sincronizar.ts`, `src/lib/planilla.ts` — la sincronización con el
+  Maestro (parsea el Excel subido, calcula rankings/récords/fichas),
+  disparada desde `/sincronizar`.
 
 ## Autenticación
 
@@ -106,15 +107,11 @@ API routes).
    `dagoperezh-lgtm/tym-kpi`.
 2. Nombre del proyecto: `tym-kpi` (queda en `tym-kpi.vercel.app`, sin tu
    nombre en la URL).
-3. En **Environment Variables**, agrega las 6 del `.env.example`:
+3. En **Environment Variables**, agrega las 4 del `.env.example`:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `SESSION_SECRET` (cualquier string largo y aleatorio)
    - `SYNC_PASSWORD` (la contraseña para entrar a `/sincronizar`)
-   - `GOOGLE_SERVICE_ACCOUNT_JSON` (el JSON completo de la cuenta de
-     servicio — puede ser la misma que ya usa club-kpi-platform, solo
-     necesita permiso de **lectura** sobre el Maestro en Drive)
-   - `DRIVE_MAESTRO_FILE_ID` (el mismo ID que usa club-kpi-platform)
 4. Deploy.
 
 ### 3. Avisarle al equipo
@@ -125,11 +122,11 @@ cuenta (nombre + contraseña, sin nada más que hacer de tu parte).
 
 ### 4. Sincronizar los datos cada semana
 
-Después de correr el procesamiento semanal en club-kpi-platform (que sube el
-Maestro actualizado a Drive), entra a
-`https://tym-kpi.vercel.app/sincronizar`, pon la `SYNC_PASSWORD` y haz clic en
-**"Sincronizar ahora"**. La página confirma cuántos atletas y récords se
-subieron, o muestra el error si algo falló.
+Después de correr el procesamiento semanal en club-kpi-platform y descargar
+el Excel Maestro actualizado (el mismo archivo de siempre), entra a
+`https://tym-kpi.vercel.app/sincronizar`, pon la `SYNC_PASSWORD`, elige ese
+archivo `.xlsx` y haz clic en **"Sincronizar ahora"**. La página confirma
+cuántos atletas y récords se subieron, o muestra el error si algo falló.
 
 ---
 

@@ -1,5 +1,4 @@
 import "server-only";
-import { descargarMaestro } from "@/lib/drive";
 import { supabaseAdmin } from "@/lib/supabase-server";
 import { matchKey } from "@/lib/match-key";
 import {
@@ -390,8 +389,8 @@ export function calcularSincronizacion(hojas: LibroHojas): ResultadoCalculo {
 }
 
 /** Descarga el Maestro desde Drive, calcula todo y sube el resultado a Supabase. */
-export async function sincronizarMaestro(): Promise<ResumenSincronizacion> {
-  const buffer = await descargarMaestro();
+/** `buffer` es el contenido del Excel Maestro que el administrador sube a mano en /sincronizar. */
+export async function sincronizarMaestro(buffer: Buffer): Promise<ResumenSincronizacion> {
   const hojas = await leerLibro(buffer);
   const resultado = calcularSincronizacion(hojas);
   const { etiqueta, semanaClub, rankings, records, fichas } = resultado;
