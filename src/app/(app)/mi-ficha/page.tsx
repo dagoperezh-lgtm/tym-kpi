@@ -1,7 +1,7 @@
 import { obtenerFicha, obtenerSemanaActual } from "@/lib/datos-club";
 import { obtenerSesion } from "@/lib/get-sesion";
 import { redirect } from "next/navigation";
-import { diferenciaConSigno, formatoHHMM, formatoKm, formatoKmh, formatoM, formatoPorcentaje } from "@/lib/formato";
+import { diferenciaConSigno, formatoHHMM, formatoPorcentaje } from "@/lib/formato";
 import type { FichaSemanal } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -42,36 +42,21 @@ export default async function MiFichaPage() {
 
       <TarjetaTPI ficha={ficha} />
 
+      {/* Distancia, salida más larga, velocidad y desnivel quedan "durmiendo"
+          por ahora — a propósito, fácil de revertir si se quiere mostrar de nuevo. */}
       <TarjetaDisciplina
         titulo="🏊‍♂️ Natación"
-        filas={[
-          ["Tiempo", formatoHHMM(ficha.minutos_natacion), diferenciaMins(ficha.minutos_natacion, semana.promedio_natacion_mins)],
-          ["Distancia", formatoKm(ficha.km_natacion), null],
-        ]}
+        filas={[["Tiempo", formatoHHMM(ficha.minutos_natacion), diferenciaMins(ficha.minutos_natacion, semana.promedio_natacion_mins)]]}
       />
 
       <TarjetaDisciplina
         titulo="🚴‍♂️ Ciclismo"
-        filas={[
-          ["Tiempo", formatoHHMM(ficha.minutos_ciclismo), diferenciaMins(ficha.minutos_ciclismo, semana.promedio_ciclismo_mins)],
-          ["Distancia", formatoKm(ficha.km_ciclismo), null],
-          ["Salida más larga", formatoKm(ficha.salida_mas_larga_ciclismo_km), null],
-          ["Vel. promedio", formatoKmh(ficha.vel_prom_ciclismo_kmh), null],
-          ["Vel. máxima", formatoKmh(ficha.vel_max_ciclismo_kmh), null],
-          ["Desnivel", formatoM(ficha.desnivel_ciclismo_m), null],
-        ]}
+        filas={[["Tiempo", formatoHHMM(ficha.minutos_ciclismo), diferenciaMins(ficha.minutos_ciclismo, semana.promedio_ciclismo_mins)]]}
       />
 
       <TarjetaDisciplina
         titulo="🏃‍♂️ Trote"
-        filas={[
-          ["Tiempo", formatoHHMM(ficha.minutos_trote), diferenciaMins(ficha.minutos_trote, semana.promedio_trote_mins)],
-          ["Distancia", formatoKm(ficha.km_trote), null],
-          ["Salida más larga", formatoKm(ficha.salida_mas_larga_trote_km), null],
-          ["Vel. promedio", formatoKmh(ficha.vel_prom_trote_kmh), null],
-          ["Vel. máxima", formatoKmh(ficha.vel_max_trote_kmh), null],
-          ["Desnivel", formatoM(ficha.desnivel_trote_m), null],
-        ]}
+        filas={[["Tiempo", formatoHHMM(ficha.minutos_trote), diferenciaMins(ficha.minutos_trote, semana.promedio_trote_mins)]]}
       />
 
       {(ficha.pulso_promedio || ficha.potencia_promedio) && (

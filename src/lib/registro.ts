@@ -32,6 +32,25 @@ export async function registrarAtleta(nombre: string, password: string): Promise
   const key = matchKey(nombreLimpio);
   const db = supabaseAdmin();
 
+  // Si ya hay al menos una semana sincronizada, el nombre tiene que coincidir
+  // con alguien que de verdad aparece en los datos de Strava — si no, lo más
+  // probable es que lo haya escrito distinto a su usuario real (con otro
+  // apellido, abreviado, etc.) y su ficha nunca le va a mostrar datos.
+  const { data: algunaFicha } = await db.from("fichas_semanales").select("atleta_match_key").limit(1);
+  if (algunaFicha && algunaFicha.length > 0) {
+    const { data: coincidencia } = await db
+      .from("fichas_semanales")
+      .select("atleta_match_key")
+      .eq("atleta_match_key", key)
+      .limit(1);
+    if (!coincidencia || coincidencia.length === 0) {
+      return {
+        ok: false,
+        error: `No encontramos "${nombreLimpio}" entre los atletas con datos de Strava. Escribe tu nombre exactamente igual a como aparece en tu cuenta de Strava e inténtalo de nuevo.`,
+      };
+    }
+  }
+
   const { data: existentes } = await db.from("atletas").select("*").eq("match_key", key).limit(1);
   const atleta = (existentes as Atleta[] | null)?.[0] ?? null;
 

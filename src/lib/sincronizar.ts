@@ -341,8 +341,7 @@ export function calcularSincronizacion(hojas: LibroHojas): ResultadoCalculo {
   agregarRanking(
     "completos",
     atletas.filter((a) => a.es_completo).map((a) => ({ atleta_match_key: a.atleta_match_key, atleta_nombre: a.atleta_nombre, valor_numerico: a.minutos_total })),
-    formatoHHMM,
-    null
+    formatoHHMM
   );
   agregarRanking("tpi_global", atletas.map((a) => ({ atleta_match_key: a.atleta_match_key, atleta_nombre: a.atleta_nombre, valor_numerico: a.tpi_global })), formatoPorcentaje);
   agregarRanking("tiempo_total", atletas.map((a) => ({ atleta_match_key: a.atleta_match_key, atleta_nombre: a.atleta_nombre, valor_numerico: a.minutos_total })), formatoHHMM);

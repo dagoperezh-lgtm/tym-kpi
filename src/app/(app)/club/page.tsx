@@ -4,31 +4,14 @@ import { formatoHHMM, formatoPorcentaje } from "@/lib/formato";
 
 export const dynamic = "force-dynamic"; // los datos se actualizan 1 vez por semana vía el sync script, no por request
 
+// Distancia, salida más larga, velocidad y desnivel quedan "durmiendo" por
+// ahora (no se muestran) — a propósito, se puede revertir fácil si en algún
+// momento se quiere activarlas de nuevo.
 const GRUPOS: { titulo: string; categorias: Categoria[] }[] = [
   { titulo: "General", categorias: ["tpi_global", "tiempo_total"] },
-  { titulo: "🏊‍♂️ Natación", categorias: ["natacion_tiempo", "natacion_distancia"] },
-  {
-    titulo: "🚴‍♂️ Ciclismo",
-    categorias: [
-      "ciclismo_tiempo",
-      "ciclismo_distancia",
-      "ciclismo_salida_larga",
-      "ciclismo_vel_prom",
-      "ciclismo_vel_max",
-      "ciclismo_desnivel",
-    ],
-  },
-  {
-    titulo: "🏃‍♂️ Trote",
-    categorias: [
-      "trote_tiempo",
-      "trote_distancia",
-      "trote_salida_larga",
-      "trote_vel_prom",
-      "trote_vel_max",
-      "trote_desnivel",
-    ],
-  },
+  { titulo: "🏊‍♂️ Natación", categorias: ["natacion_tiempo"] },
+  { titulo: "🚴‍♂️ Ciclismo", categorias: ["ciclismo_tiempo"] },
+  { titulo: "🏃‍♂️ Trote", categorias: ["trote_tiempo"] },
 ];
 
 const MEDALLAS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
