@@ -236,7 +236,12 @@ export function calcularSincronizacion(hojas: LibroHojas): ResultadoCalculo {
   }
 
   const colId = columnaIdentidad(hojaTotal);
-  const atletas: DatosAtleta[] = [];
+  // Mapa en vez de array: si el Maestro trae dos filas que normalizan a la
+  // misma llave (ej. una entrada duplicada o escrita de dos formas
+  // distintas), Supabase rechaza subir dos filas con la misma llave en un
+  // solo upsert ("ON CONFLICT DO UPDATE command cannot affect row a second
+  // time") — nos quedamos con la fila que tenga más actividad esa semana.
+  const atletasPorKey = new Map<string, DatosAtleta>();
 
   for (const fila of hojaTotal.filas) {
     const nombre = textoOVacio(fila[colId]);
@@ -274,8 +279,13 @@ export function calcularSincronizacion(hojas: LibroHojas): ResultadoCalculo {
       atleta[campoFicha] = valorSemana(hojaMetrica, etiqueta, key, numeroOCero) ?? 0;
     }
 
-    atletas.push(atleta);
+    const existente = atletasPorKey.get(key);
+    if (!existente || atleta.minutos_total > existente.minutos_total) {
+      atletasPorKey.set(key, atleta);
+    }
   }
+
+  const atletas = Array.from(atletasPorKey.values());
 
   if (atletas.length === 0) {
     throw new Error("No se encontró ningún atleta con datos esta semana. Nada que sincronizar.");
