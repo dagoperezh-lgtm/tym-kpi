@@ -1,4 +1,4 @@
-import { obtenerFicha, obtenerSemanaActual } from "@/lib/datos-club";
+import { obtenerFicha, obtenerMediaHistorica, obtenerSemanaActual } from "@/lib/datos-club";
 import { obtenerSesion } from "@/lib/get-sesion";
 import { redirect } from "next/navigation";
 import { diferenciaConSigno, formatoHHMM, formatoPorcentaje } from "@/lib/formato";
@@ -31,6 +31,8 @@ export default async function MiFichaPage() {
     );
   }
 
+  const mediaHistorica = await obtenerMediaHistorica(sesion.matchKey, semana.etiqueta_semana);
+
   return (
     <div className="mx-auto max-w-lg space-y-6 px-4 py-5">
       <div>
@@ -46,17 +48,44 @@ export default async function MiFichaPage() {
           por ahora — a propósito, fácil de revertir si se quiere mostrar de nuevo. */}
       <TarjetaDisciplina
         titulo="🏊‍♂️ Natación"
-        filas={[["Tiempo", formatoHHMM(ficha.minutos_natacion), diferenciaMins(ficha.minutos_natacion, semana.promedio_natacion_mins)]]}
+        filas={[
+          [
+            "Tiempo",
+            formatoHHMM(ficha.minutos_natacion),
+            [
+              diferenciaEquipo(ficha.minutos_natacion, semana.promedio_natacion_mins),
+              diferenciaHistorica(ficha.minutos_natacion, mediaHistorica?.natacion ?? null),
+            ],
+          ],
+        ]}
       />
 
       <TarjetaDisciplina
         titulo="🚴‍♂️ Ciclismo"
-        filas={[["Tiempo", formatoHHMM(ficha.minutos_ciclismo), diferenciaMins(ficha.minutos_ciclismo, semana.promedio_ciclismo_mins)]]}
+        filas={[
+          [
+            "Tiempo",
+            formatoHHMM(ficha.minutos_ciclismo),
+            [
+              diferenciaEquipo(ficha.minutos_ciclismo, semana.promedio_ciclismo_mins),
+              diferenciaHistorica(ficha.minutos_ciclismo, mediaHistorica?.ciclismo ?? null),
+            ],
+          ],
+        ]}
       />
 
       <TarjetaDisciplina
         titulo="🏃‍♂️ Trote"
-        filas={[["Tiempo", formatoHHMM(ficha.minutos_trote), diferenciaMins(ficha.minutos_trote, semana.promedio_trote_mins)]]}
+        filas={[
+          [
+            "Tiempo",
+            formatoHHMM(ficha.minutos_trote),
+            [
+              diferenciaEquipo(ficha.minutos_trote, semana.promedio_trote_mins),
+              diferenciaHistorica(ficha.minutos_trote, mediaHistorica?.trote ?? null),
+            ],
+          ],
+        ]}
       />
 
       {(ficha.pulso_promedio || ficha.potencia_promedio) && (
@@ -83,9 +112,14 @@ export default async function MiFichaPage() {
   );
 }
 
-function diferenciaMins(valor: number | null, promedio: number | null): string | null {
+function diferenciaEquipo(valor: number | null, promedio: number | null): string | null {
   if (valor == null || promedio == null) return null;
   return `${diferenciaConSigno(valor, promedio, formatoHHMM)} vs. promedio equipo`;
+}
+
+function diferenciaHistorica(valor: number | null, mediaHistorica: number | null): string | null {
+  if (valor == null || mediaHistorica == null) return null;
+  return `${diferenciaConSigno(valor, mediaHistorica, formatoHHMM)} vs. tu media histórica`;
 }
 
 function EstadoYRacha({ ficha }: { ficha: FichaSemanal }) {
@@ -137,18 +171,24 @@ function TarjetaDisciplina({
   filas,
 }: {
   titulo: string;
-  filas: [string, string, string | null][];
+  filas: [string, string, (string | null)[]][];
 }) {
   return (
     <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <h3 className="mb-2 text-sm font-semibold text-slate-900">{titulo}</h3>
       <dl className="divide-y divide-slate-100">
-        {filas.map(([label, valor, comparacion]) => (
+        {filas.map(([label, valor, comparaciones]) => (
           <div key={label} className="flex items-center justify-between py-1.5 text-sm">
             <dt className="text-slate-500">{label}</dt>
             <dd className="text-right">
               <span className="font-medium text-slate-900">{valor}</span>
-              {comparacion && <span className="block text-[11px] text-slate-400">{comparacion}</span>}
+              {comparaciones
+                .filter((c): c is string => c !== null)
+                .map((c) => (
+                  <span key={c} className="block text-[11px] text-slate-400">
+                    {c}
+                  </span>
+                ))}
             </dd>
           </div>
         ))}

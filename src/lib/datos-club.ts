@@ -62,3 +62,34 @@ export async function obtenerFicha(etiquetaSemana: string, matchKey: string): Pr
     .maybeSingle<FichaSemanal>();
   return data ?? null;
 }
+
+export interface MediaHistorica {
+  natacion: number | null;
+  ciclismo: number | null;
+  trote: number | null;
+}
+
+/**
+ * Promedio de minutos por disciplina del propio atleta, sobre todas las
+ * semanas que no sean la actual. null si es su primera semana con datos
+ * (nada contra qué comparar todavía).
+ */
+export async function obtenerMediaHistorica(matchKey: string, etiquetaActual: string): Promise<MediaHistorica | null> {
+  const db = supabaseAdmin();
+  const { data } = await db
+    .from("fichas_semanales")
+    .select("minutos_natacion, minutos_ciclismo, minutos_trote")
+    .eq("atleta_match_key", matchKey)
+    .neq("etiqueta_semana", etiquetaActual);
+
+  const filas = (data as Pick<FichaSemanal, "minutos_natacion" | "minutos_ciclismo" | "minutos_trote">[] | null) ?? [];
+  if (filas.length === 0) return null;
+
+  const promedio = (valores: (number | null)[]) =>
+    valores.reduce((suma: number, valor) => suma + (valor ?? 0), 0) / valores.length;
+  return {
+    natacion: promedio(filas.map((f) => f.minutos_natacion)),
+    ciclismo: promedio(filas.map((f) => f.minutos_ciclismo)),
+    trote: promedio(filas.map((f) => f.minutos_trote)),
+  };
+}
