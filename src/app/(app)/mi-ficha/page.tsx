@@ -13,7 +13,7 @@ export default async function MiFichaPage() {
   const semana = await obtenerSemanaActual();
   if (!semana) {
     return (
-      <div className="px-4 py-10 text-center text-sm text-slate-500">
+      <div className="px-4 py-10 text-center text-sm sm:text-base text-slate-500 dark:text-slate-400">
         Todavía no hay datos sincronizados. Vuelve después de la primera actualización semanal.
       </div>
     );
@@ -22,8 +22,8 @@ export default async function MiFichaPage() {
   const ficha = await obtenerFicha(semana.etiqueta_semana, sesion.matchKey);
   if (!ficha) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-10 text-center">
-        <p className="text-sm text-slate-500">
+      <div className="mx-auto max-w-lg md:max-w-xl px-4 py-10 text-center">
+        <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">
           No encontramos datos tuyos para <strong>{semana.etiqueta_semana}</strong>. Si entrenaste esta semana y no
           aparece, avísale a quien administra el club.
         </p>
@@ -34,10 +34,10 @@ export default async function MiFichaPage() {
   const mediaHistorica = await obtenerMediaHistorica(sesion.matchKey, semana.etiqueta_semana);
 
   return (
-    <div className="mx-auto max-w-lg space-y-6 px-4 py-5">
+    <div className="mx-auto max-w-lg md:max-w-xl space-y-6 px-4 py-5">
       <div>
-        <h1 className="text-lg font-bold text-slate-900">{ficha.atleta_nombre}</h1>
-        <p className="text-xs text-slate-400">{semana.etiqueta_semana}</p>
+        <h1 className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-50">{ficha.atleta_nombre}</h1>
+        <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500">{semana.etiqueta_semana}</p>
       </div>
 
       <EstadoYRacha ficha={ficha} />
@@ -89,10 +89,10 @@ export default async function MiFichaPage() {
       />
 
       {(ficha.pulso_promedio || ficha.potencia_promedio) && (
-        <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-          <h3 className="mb-1 text-sm font-semibold text-slate-900">Datos personales</h3>
-          <p className="mb-3 text-[11px] text-slate-400">Solo tú ves esto — no se compara con el equipo</p>
-          <div className="grid grid-cols-2 gap-3 text-sm">
+        <section className="rounded-xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
+          <h3 className="mb-1 text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-50">Datos personales</h3>
+          <p className="mb-3 text-[11px] sm:text-xs text-slate-400 dark:text-slate-500">Solo tú ves esto — no se compara con el equipo</p>
+          <div className="grid grid-cols-2 gap-3 text-sm sm:text-base">
             {ficha.pulso_promedio && (
               <>
                 <FilaDato label="Pulso promedio" valor={`${Math.round(ficha.pulso_promedio)} ppm`} />
@@ -125,15 +125,15 @@ function diferenciaHistorica(valor: number | null, mediaHistorica: number | null
 function EstadoYRacha({ ficha }: { ficha: FichaSemanal }) {
   return (
     <section className="flex gap-3">
-      <div className="flex-1 rounded-xl bg-white p-4 text-center shadow-sm ring-1 ring-slate-200">
-        <p className="text-[11px] text-slate-400">Estado de la semana</p>
-        <p className={`mt-1 text-sm font-bold ${ficha.es_completo ? "text-emerald-600" : "text-slate-500"}`}>
+      <div className="flex-1 rounded-xl bg-white dark:bg-slate-900 p-4 text-center shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
+        <p className="text-[11px] sm:text-xs text-slate-400 dark:text-slate-500">Estado de la semana</p>
+        <p className={`mt-1 text-sm sm:text-base font-bold ${ficha.es_completo ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}>
           {ficha.es_completo ? "✅ Triatleta Completo" : "Incompleto"}
         </p>
       </div>
-      <div className="flex-1 rounded-xl bg-white p-4 text-center shadow-sm ring-1 ring-slate-200">
-        <p className="text-[11px] text-slate-400">🔥 Racha de constancia</p>
-        <p className="mt-1 text-sm font-bold text-slate-900">
+      <div className="flex-1 rounded-xl bg-white dark:bg-slate-900 p-4 text-center shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
+        <p className="text-[11px] sm:text-xs text-slate-400 dark:text-slate-500">🔥 Racha de constancia</p>
+        <p className="mt-1 text-sm sm:text-base font-bold text-slate-900 dark:text-slate-50">
           {ficha.racha_completo} {ficha.racha_completo === 1 ? "semana" : "semanas"}
         </p>
       </div>
@@ -143,8 +143,8 @@ function EstadoYRacha({ ficha }: { ficha: FichaSemanal }) {
 
 function TarjetaTPI({ ficha }: { ficha: FichaSemanal }) {
   return (
-    <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-      <h3 className="mb-3 text-sm font-semibold text-slate-900">Adherencia al Plan (TPI)</h3>
+    <section className="rounded-xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
+      <h3 className="mb-3 text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-50">Adherencia al Plan (TPI)</h3>
       <div className="grid grid-cols-4 gap-2 text-center">
         <TpiMini label="Global" valor={ficha.tpi_global} destacado />
         <TpiMini label="Nat." valor={ficha.tpi_natacion} />
@@ -158,10 +158,10 @@ function TarjetaTPI({ ficha }: { ficha: FichaSemanal }) {
 function TpiMini({ label, valor, destacado }: { label: string; valor: number | null; destacado?: boolean }) {
   return (
     <div>
-      <p className={`font-bold ${destacado ? "text-xl text-blue-600" : "text-base text-slate-700"}`}>
+      <p className={`font-bold ${destacado ? "text-xl sm:text-2xl text-blue-600 dark:text-blue-400" : "text-base sm:text-lg text-slate-700 dark:text-slate-300"}`}>
         {formatoPorcentaje(valor)}
       </p>
-      <p className="text-[10px] text-slate-400">{label}</p>
+      <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500">{label}</p>
     </div>
   );
 }
@@ -174,18 +174,18 @@ function TarjetaDisciplina({
   filas: [string, string, (string | null)[]][];
 }) {
   return (
-    <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-      <h3 className="mb-2 text-sm font-semibold text-slate-900">{titulo}</h3>
-      <dl className="divide-y divide-slate-100">
+    <section className="rounded-xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
+      <h3 className="mb-2 text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-50">{titulo}</h3>
+      <dl className="divide-y divide-slate-100 dark:divide-slate-800">
         {filas.map(([label, valor, comparaciones]) => (
-          <div key={label} className="flex items-center justify-between py-1.5 text-sm">
-            <dt className="text-slate-500">{label}</dt>
+          <div key={label} className="flex items-center justify-between py-1.5 text-sm sm:text-base">
+            <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
             <dd className="text-right">
-              <span className="font-medium text-slate-900">{valor}</span>
+              <span className="font-medium text-slate-900 dark:text-slate-50">{valor}</span>
               {comparaciones
                 .filter((c): c is string => c !== null)
                 .map((c) => (
-                  <span key={c} className="block text-[11px] text-slate-400">
+                  <span key={c} className="block text-[11px] sm:text-xs text-slate-400 dark:text-slate-500">
                     {c}
                   </span>
                 ))}
@@ -200,8 +200,8 @@ function TarjetaDisciplina({
 function FilaDato({ label, valor }: { label: string; valor: string }) {
   return (
     <div>
-      <p className="text-[11px] text-slate-400">{label}</p>
-      <p className="font-semibold text-slate-900">{valor}</p>
+      <p className="text-[11px] sm:text-xs text-slate-400 dark:text-slate-500">{label}</p>
+      <p className="font-semibold text-slate-900 dark:text-slate-50">{valor}</p>
     </div>
   );
 }

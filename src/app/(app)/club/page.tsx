@@ -21,7 +21,7 @@ export default async function ClubPage() {
 
   if (!semana) {
     return (
-      <div className="px-4 py-10 text-center text-sm text-slate-500">
+      <div className="px-4 py-10 text-center text-sm sm:text-base text-slate-500 dark:text-slate-400">
         Todavía no hay datos sincronizados. Vuelve después de la primera actualización semanal.
       </div>
     );
@@ -34,11 +34,11 @@ export default async function ClubPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-lg space-y-6 px-4 py-5">
+    <div className="mx-auto max-w-lg md:max-w-xl space-y-6 px-4 py-5">
       <div>
-        <h1 className="text-lg font-bold text-slate-900">{semana.etiqueta_semana}</h1>
+        <h1 className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-50">{semana.etiqueta_semana}</h1>
         {semana.fecha_inicio && semana.fecha_fin && (
-          <p className="text-xs text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500">
             {formatoFecha(semana.fecha_inicio)} al {formatoFecha(semana.fecha_fin)}
           </p>
         )}
@@ -61,7 +61,7 @@ export default async function ClubPage() {
 
       {GRUPOS.map((grupo) => (
         <div key={grupo.titulo} className="space-y-4">
-          <h2 className="px-1 text-sm font-bold uppercase tracking-wide text-slate-500">{grupo.titulo}</h2>
+          <h2 className="px-1 text-sm sm:text-base font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{grupo.titulo}</h2>
           {grupo.categorias.map((categoria) => (
             <TablaRanking
               key={categoria}
@@ -78,28 +78,28 @@ export default async function ClubPage() {
 
 function Dato({ label, valor, chico }: { label: string; valor: string; chico?: boolean }) {
   return (
-    <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
-      <p className="text-[11px] text-slate-400">{label}</p>
-      <p className={`font-semibold text-slate-900 ${chico ? "text-xs" : "text-base"}`}>{valor}</p>
+    <div className="rounded-xl bg-white dark:bg-slate-900 p-3 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
+      <p className="text-[11px] sm:text-xs text-slate-400 dark:text-slate-500">{label}</p>
+      <p className={`font-semibold text-slate-900 dark:text-slate-50 ${chico ? "text-xs sm:text-sm" : "text-base sm:text-lg"}`}>{valor}</p>
     </div>
   );
 }
 
 function SeccionCompletos({ atletas }: { atletas: { posicion: number; atleta_nombre: string; valor_mostrado: string }[] }) {
   return (
-    <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-      <h2 className="mb-1 text-sm font-bold text-slate-900">Triatletas Completos</h2>
-      <p className="mb-3 text-[11px] text-slate-400">Entrenaron las 3 disciplinas esta semana</p>
+    <section className="rounded-xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
+      <h2 className="mb-1 text-sm sm:text-base font-bold text-slate-900 dark:text-slate-50">Triatletas Completos</h2>
+      <p className="mb-3 text-[11px] sm:text-xs text-slate-400 dark:text-slate-500">Entrenaron las 3 disciplinas esta semana</p>
       {atletas.length === 0 ? (
-        <p className="text-sm text-slate-400">Nadie completó las 3 disciplinas esta semana.</p>
+        <p className="text-sm sm:text-base text-slate-400 dark:text-slate-500">Nadie completó las 3 disciplinas esta semana.</p>
       ) : (
         <ol className="space-y-1.5">
           {atletas.map((a) => (
-            <li key={a.posicion} className="flex items-center justify-between text-sm">
-              <span className="text-slate-700">
+            <li key={a.posicion} className="flex items-center justify-between text-sm sm:text-base">
+              <span className="text-slate-700 dark:text-slate-300">
                 {MEDALLAS[a.posicion] ?? `${a.posicion}.`} {a.atleta_nombre}
               </span>
-              <span className="font-medium text-slate-900">{a.valor_mostrado}</span>
+              <span className="font-medium text-slate-900 dark:text-slate-50">{a.valor_mostrado}</span>
             </li>
           ))}
         </ol>
@@ -119,20 +119,20 @@ function TablaRanking({
 }) {
   if (filas.length === 0) return null;
   return (
-    <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-      <h3 className="mb-2 text-sm font-semibold text-slate-900">{titulo}</h3>
+    <section className="rounded-xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
+      <h3 className="mb-2 text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-50">{titulo}</h3>
       <ol className="space-y-1.5">
         {filas.map((f) => (
-          <li key={f.posicion} className="flex items-center justify-between text-sm">
-            <span className="text-slate-700">
+          <li key={f.posicion} className="flex items-center justify-between text-sm sm:text-base">
+            <span className="text-slate-700 dark:text-slate-300">
               {MEDALLAS[f.posicion] ?? `${f.posicion}.`} {f.atleta_nombre}
             </span>
-            <span className="font-medium text-slate-900">{f.valor_mostrado}</span>
+            <span className="font-medium text-slate-900 dark:text-slate-50">{f.valor_mostrado}</span>
           </li>
         ))}
       </ol>
       {record?.valor_mostrado && (
-        <p className="mt-3 rounded-lg bg-amber-50 px-2.5 py-2 text-xs text-amber-800">
+        <p className="mt-3 rounded-lg bg-amber-50 dark:bg-amber-950/50 px-2.5 py-2 text-xs sm:text-sm text-amber-800 dark:text-amber-300">
           🏆 Récord del club: <span className="font-semibold">{record.atleta_nombre}</span> — {record.valor_mostrado}
           {record.fecha ? ` (${record.fecha})` : ""}
         </p>

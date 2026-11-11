@@ -48,11 +48,18 @@ function pagina(tipo: "ok" | "error", mensaje: string): NextResponse {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sincronizar</title>
 <style>
+  :root { color-scheme: light dark; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; color: #0f172a; background: #f8fafc; }
   h1 { font-size: 18px; }
   .ok { background: #ecfdf5; color: #065f46; border-radius: 10px; padding: 14px; font-size: 14px; margin-bottom: 16px; }
   .error { background: #fef2f2; color: #b91c1c; border-radius: 10px; padding: 14px; font-size: 14px; margin-bottom: 16px; }
   a.boton { display: block; width: 100%; box-sizing: border-box; text-align: center; background: #2563eb; color: #fff; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #f1f5f9; background: #0f172a; }
+    .ok { background: #052e22; color: #6ee7b7; }
+    .error { background: #450a0a; color: #fca5a5; }
+    a.boton { background: #3b82f6; }
+  }
 </style>
 </head>
 <body>

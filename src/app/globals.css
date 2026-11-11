@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Le dice al navegador que la página sí sabe manejar modo oscuro, para
+     que los controles nativos (inputs, etc.) usen la paleta correcta en
+     vez de que el navegador intente adivinar/invertir colores solo. */
+  color-scheme: light dark;
 }
 
 @theme inline {

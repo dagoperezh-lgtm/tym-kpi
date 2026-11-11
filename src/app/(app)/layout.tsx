@@ -11,10 +11,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 px-4 py-3 backdrop-blur">
         <div>
-          <p className="text-xs text-slate-400">Club TYM</p>
-          <p className="text-sm font-semibold text-slate-900">{sesion.nombre}</p>
+          <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500">Club TYM</p>
+          <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-50">{sesion.nombre}</p>
         </div>
         <BotonSalir />
       </header>
