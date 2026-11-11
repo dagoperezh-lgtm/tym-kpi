@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { obtenerSesion } from "@/lib/get-sesion";
 import NavInferior from "./nav-inferior";
@@ -12,9 +13,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 px-4 py-3 backdrop-blur">
-        <div>
-          <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500">Club TYM</p>
-          <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-50">{sesion.nombre}</p>
+        <div className="flex items-center gap-2.5">
+          <Image src="/tym-logo.png" alt="" width={36} height={36} className="rounded-full" priority />
+          <div>
+            <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500">Club TYM</p>
+            <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-50">{sesion.nombre}</p>
+          </div>
         </div>
         <BotonSalir />
       </header>

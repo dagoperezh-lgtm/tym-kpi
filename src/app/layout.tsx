@@ -13,14 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TYM KPI",
+  title: "Club TYM",
   description: "Panel de resultados del Club TYM Triatlón",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "TYM",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#84cc16",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

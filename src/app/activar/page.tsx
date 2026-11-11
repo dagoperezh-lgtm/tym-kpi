@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default async function ActivarPage({
   searchParams,
 }: {
@@ -8,7 +10,8 @@ export default async function ActivarPage({
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm sm:max-w-md">
-        <div className="mb-8 text-center">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Image src="/tym-logo.png" alt="Club TYM" width={88} height={88} className="mb-3 rounded-full" priority />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
             Crea tu cuenta
           </h1>
